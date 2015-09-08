@@ -1,0 +1,8 @@
+name: EIRP_git
+account: nemobot
+server: shinyapps.io
+bundleId: 260187
+url: https://nemobot.shinyapps.io/EIRP_git
+when: 1441696074.03689
+asMultiple: FALSE
+asStatic: FALSE

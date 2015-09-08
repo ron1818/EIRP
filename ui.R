@@ -18,60 +18,6 @@ header<-dashboardHeader(
   dropdownMenuOutput("notificationMenu"),
   # dynamic task
   dropdownMenuOutput("taskMenu")
-
-  #   #static message
-  #   dropdownMenu(type = "messages",
-  #                messageItem(
-  #                  from = "Sales Dept",
-  #                  message = "Sales are steady this month."
-  #                ),
-  #                messageItem(
-  #                  from = "New User",
-  #                  message = "How do I register?",
-  #                  icon = icon("question"),
-  #                  time = "13:45"
-  #                ),
-  #                messageItem(
-  #                  from = "Support",
-  #                  message = "The new server is ready.",
-  #                  icon = icon("life-ring"),
-  #                  time = "2014-12-01"
-  #                )
-  #   ),
-  #
-  #   #static notification
-  #   dropdownMenu(type = "notifications",
-  #                notificationItem(
-  #                  text = "5 new users today",
-  #                  icon("users")
-  #                ),
-  #                notificationItem(
-  #                  text = "12 items delivered",
-  #                  icon("truck"),
-  #                  status = "success"
-  #                ),
-  #                notificationItem(
-  #                  text = "Server load at 86%",
-  #                  icon = icon("exclamation-triangle"),
-  #                  status = "warning"
-  #                )
-  #   ),
-  #
-  #   # static tasks
-  #   dropdownMenu(type = "tasks", badgeStatus = "success",
-  #                taskItem(value = 90, color = "green",
-  #                         "Documentation"
-  #                ),
-  #                taskItem(value = 17, color = "aqua",
-  #                         "Project X"
-  #                ),
-  #                taskItem(value = 75, color = "yellow",
-  #                         "Server deployment"
-  #                ),
-  #                taskItem(value = 80, color = "red",
-  #                         "Overall project"
-  #                )
-  #   )
 )
 
 #### sidebar ####
@@ -79,6 +25,7 @@ sidebar<-dashboardSidebar(
   sidebarMenu(
     sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
                       label = "Search..."),
+    menuItem("Login", tabName = "dblogin", icon = icon("user")),
     menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
     menuItem("Resouce", tabName = "resource", icon = icon("bolt")),
     menuItem("Weather", tabName = "weather", icon = icon("cloud")),
@@ -95,15 +42,51 @@ sidebar<-dashboardSidebar(
 #### body ####
 body<-dashboardBody(
   tabItems(
-    # First tab content
-    tabItem(tabName = "dashboard",
+    #login tab
+    tabItem(tabName = 'dblogin',
+            fluidRow(
+              box(
+                title='Database login',
+                status='info',
+                solidHeader = TRUE,
+                collapsible = TRUE,
+                # mysql database login
+                textInput('sqluser','User',Sys.info()['user']),
+                passwordInput('sqlpassword','Password',''),
+                textInput('sqldbname','Database','nemobot'),
+                textInput('sqlhost','Host','localhost'),
+                submitButton('Login',icon('sign-in'))
+                #actionButton('sqllogoutButton', 'Logout')
+              ),
+              box(
+                title='Database login result',
+                status = 'info',
+                "Database Status:",
+                verbatimTextOutput('sqlstatus'),
+                "Database Summary:",
+                textOutput('sqlsummary')
+              )
+            ),
+            fluidRow(
+              box(
+                title='MySQL Console',
+                status='success',
+                verbatimTextOutput('sqlqueryout'),
+                textInput('sqlqueryin','SQL Query',''),
+                submitButton('',icon('arrow-up'))
+              )
+            )
+    ),
 
+    # dashboard tab content
+    tabItem(tabName = "dashboard",
             # time and date
             fluidRow(
               box(
                 title='Refresh Rate (second)',
                 status='info',
                 solidHeader = TRUE,
+                collapsible = TRUE,
                 # refresh rate
                 sliderInput('DashboardRefreshrate','',min=1,max=60,
                             value=5,round=TRUE)
@@ -167,14 +150,14 @@ body<-dashboardBody(
     # navigation tab content
     tabItem(tabName = "navigation",
             h2("Current Position"),
-             fluidRow(
-               # GPS coordinates
-               box(title='GPS Coordinates',
-                   status = 'info',
-                   solidHeader = TRUE,
-                   collapsible = TRUE,
-                   textOutput('GPScoordinates'))
-             ),
+            fluidRow(
+              # GPS coordinates
+              box(title='GPS Coordinates',
+                  status = 'info',
+                  solidHeader = TRUE,
+                  collapsible = TRUE,
+                  textOutput('GPScoordinates'))
+            ),
 
             leafletOutput('mymap')
     )
