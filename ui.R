@@ -9,6 +9,21 @@
 #### description ####
 # Shiny Dashboard for Nemobot Project
 
+textInputsmall<-function (inputId, label, value = "",...)
+{
+  div(style="display:inline-block",
+      tags$label(label, `for` = inputId),
+      tags$input(id = inputId, type = "text", value = value,...))
+}
+
+passwordInputsmall<-function (inputId, label, value = "",...)
+{
+  div(style="display:inline-block",
+      tags$label(label, `for` = inputId),
+      tags$input(id = inputId, type = "password", value = value,...))
+}
+
+
 ####header ####
 header<-dashboardHeader(
   title = "Nemobot Dashboard",
@@ -46,34 +61,51 @@ body<-dashboardBody(
     tabItem(tabName = 'dblogin',
             fluidRow(
               box(
-                title='Database login',
+                title='Database Login',
                 status='info',
                 solidHeader = TRUE,
                 collapsible = TRUE,
+
                 # mysql database login
-                textInput('sqluser','User',Sys.info()['user']),
-                passwordInput('sqlpassword','Password',''),
-                textInput('sqldbname','Database','nemobot'),
-                textInput('sqlhost','Host','localhost'),
-                submitButton('Login',icon('sign-in'))
-                #actionButton('sqllogoutButton', 'Logout')
+                # textInput('sqluser','User: ', 'renye'),
+                # passwordInput('sqlpassword','Password: ','renye'),
+                # textInput('sqlhost','Host: ','localhost'),
+                # textInput('sqldbname','Database: ','nemobot'),
+                textInputsmall('sqluser','User: ',class='input-small'),
+                passwordInputsmall('sqlpassword','Password: ',class='input-small'),
+                textInputsmall('sqlhost','Host: ','localhost',class='input-small'),
+                textInputsmall('sqldbname','Database: ','nemobot',class='input-small'),
+                br(), # insert a break
+                # actionButton('sqlloginbutton','Login',icon('sign-in')),
+                # actionButton('sqlresetbutton','Reset',icon('undo')),
+                # actionButton('sqllogoutbutton','Logout',icon('sign-out'))
+                div(style='display:inline-block',
+                    actionButton('sqlloginbutton','Login',icon('sign-in'))),
+                div(style='display:inline-block',
+                    actionButton('sqlresetbutton','Reset',icon('undo'))),
+                div(style='display:inline-block',
+                    actionButton('sqllogoutbutton','Logout',icon('sign-out')))
               ),
               box(
-                title='Database login result',
-                status = 'info',
+                title='Login Status',
+                status = 'success',
+                solidHeader = TRUE,
+                collapsible = TRUE,
+
+                #tableOutput('out'),
                 "Database Status:",
                 verbatimTextOutput('sqlstatus'),
                 "Database Summary:",
-                textOutput('sqlsummary')
+                tableOutput('sqlsummary')
               )
             ),
             fluidRow(
-              box(
-                title='MySQL Console',
-                status='success',
-                verbatimTextOutput('sqlqueryout'),
-                textInput('sqlqueryin','SQL Query',''),
-                submitButton('',icon('arrow-up'))
+              box(width=12,
+                  title='MySQL Console',
+                  status = 'primary',
+                  tableOutput('sqlqueryout'),
+                  textInput('sqlqueryin','SQL Query',''),
+                  actionButton('sqlquerybutton','Run',icon('arrow-up'))
               )
             )
     ),
@@ -164,4 +196,5 @@ body<-dashboardBody(
   )
 )
 
+# add the components together to generate ui function
 ui <- dashboardPage(header, sidebar, body)

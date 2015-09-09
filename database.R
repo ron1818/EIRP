@@ -21,12 +21,9 @@ PORT=3306
 DB='employees'
 
 # open database
-try(
 con<-dbConnect(MySQL(),
                  user=USER, password=PASSWORD,port=PORT,
-                 dbname=DB, host=HOST),
-silent = TRUE
-)
+                 dbname=DB, host=HOST)
 #close database on exit
 on.exit(dbDisconnect(con))
 

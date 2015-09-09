@@ -48,7 +48,8 @@ taskData<-data.frame(
 )
 
 # system time function, retrieve system time
-system.time.text<-function() format(Sys.time(), "%a %d/%m/%y %H:%M:%S")
+system.time.text<-function()
+  format(Sys.time(), "%a %d/%m/%y %H:%M:%S")
 
 # GPS data function, retrieve GPS data
 GPS.retrieve<-function()
@@ -97,32 +98,45 @@ battery.retrieve<-function()
   ))
 }
 
+fn.sql.print<-function(user,password,host,database){
+ return(paste0(user,":",password,"@",host,"(",database,")"))
+}
 # check and open sql database
-fn.sql.login.check<-function(user,password,host,database){
-  # open database
-  tmp<-strsplit(host,':')[[1]]
-  hostname<-tmp[1]
-  port=tmp[2]
-  # try to connect
-  error.handler<-tryCatch.W.E(
-    con <- dbConnect(MySQL(),
-                     user=user, password=password,
-                     dbname=database, host=hostname, port=port))
-  #close database on exit
-  on.exit(dbDisconnect(con))
-  # check error handler
-  if(class(error.handler$value)=='MySQLConnection'){
-    status='Connected'
-    msg='Connected to the MySQL server'
+fn.sql.login<-function(user,password,host,database){
+  # check whether the host name contain a port number
+  if(length(grep(':',host))>0){ # cannot find a : in the host name
+    tmp<-strsplit(host,':')[[1]]
+    hostname<-tmp[1]
+    port=tmp[2]
   }else{
-    remove(con)
-    status='Disconnected'
-    msg=error.handler$value
+    hostname=host
+    port=3306 #default port name
   }
 
-  return(list(status=status,msg=msg))
+  # try to connect
+  con <- dbConnect(MySQL(),
+                   user=user,
+                   password=password,
+                   dbname=database,
+                   host=hostname,
+                   port=port)
+  # #close database on exit
+  # on.exit(dbDisconnect(con))
+  # # check error handler
+  # if(class(error.handler$value)=='MySQLConnection'){
+  #   status='Connected'
+  #   msg='Connected to the MySQL server'
+  # }else{
+  #   remove(con)
+  #   status='Disconnected'
+  #   msg=error.handler$value
+  # }
+
+  return(con)
 }
 
+# use tryCatch to locate error and warning
+# under development
 tryCatch.W.E <- function(expr)
 {
   W <- NULL
